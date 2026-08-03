@@ -9,7 +9,10 @@ from pprint import pprint
 import json
 import random
 import requests
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent
+AVATAR_PATH = BASE_DIR / "photo.jpg"
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if OPENAI_API_KEY is None:
@@ -154,7 +157,7 @@ send_notification_function = {
     "name": "send_notification",
     "description": "Sends a push notification to the real world version of you via Pushover. Use this when: 1) Someone wants to get in touch, hire, or collaborate\
         -ask for their name, contact details, and information about what they wish to talk about first, then send notitifcation to Lily with the name, contact details, and some details on why they wish to speak. \
-            2) you don't know the answer to a question about Lily - send automatically without asking, include the question so that she can add the info later",
+            2) you don't know the answer to a question about Lily - send a note about this to Lily, unless the question is about how to contact the real Lily, in which case just ask the person to leave their information and Lily will reach out accordingly",
     "parameters": {
         "type": "object",
         "properties": {
@@ -284,6 +287,7 @@ def respond_ai(message,history): #the function that Gradio calls everytime user 
 #gr.ChatInterface(
 #    fn=respond_ai).launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)))  
 
+
 if __name__ == "__main__":
     demo = gr.ChatInterface(
         fn=respond_ai,
@@ -291,11 +295,11 @@ if __name__ == "__main__":
         type="messages",
         description=(
             "Chat with an AI version of Lily Lin. "
-            "Ask about her experience and get in touch."
+            "Ask about her experience and get in touch about opportunities."
         ),
         chatbot=gr.Chatbot(
             type="messages",
-            avatar_images=(None, "photo.jpg"),
+            avatar_images=(None, str(AVATAR_PATH)),
         ),
         examples=[
             "Tell me about your professional experience",
@@ -309,4 +313,5 @@ if __name__ == "__main__":
         server_name="0.0.0.0",
         server_port=int(os.environ.get("PORT", "7860")),
         share=False,
+        allowed_paths=[str(AVATAR_PATH)],
     )
