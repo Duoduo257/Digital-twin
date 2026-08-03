@@ -12,7 +12,7 @@ import requests
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-AVATAR_PATH = BASE_DIR / "photo.jpg"
+AVATAR_PATH = BASE_DIR / "photo.JPG"
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if OPENAI_API_KEY is None:
