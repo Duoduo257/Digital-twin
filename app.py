@@ -287,7 +287,11 @@ def respond_ai(message,history): #the function that Gradio calls everytime user 
 if __name__ == "__main__":
     demo = gr.ChatInterface(
     fn=respond_ai,
+    title="Lily's Digital Twin",
     type="messages",
+    description="Chat with an AI version of Lily Lin. Ask about her experience and get in touch.",
+    chatbot=gr.Chatbot(avatar_images =(None, "photo.jpg")),
+    examples = [Tell me about your professional experience]
 )
 
     demo.launch(
