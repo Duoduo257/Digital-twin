@@ -8,6 +8,7 @@ import chromadb
 from pprint import pprint
 import json
 import random
+import requests
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -143,8 +144,11 @@ pushover_token = os.getenv("PUSHOVER_TOKEN")
 pushover_url = "https://api.pushover.net/1/messages.json"
 
 def send_notification(message: str):
+    if pushover_user is None or pushover_token is None:
+        return "Notification failed"
     payload = {"user":pushover_user, "token":pushover_token, "message": message}
     requests.post(pushover_url, data=payload)
+    return f"Notification sent: {message}"
 
 send_notification_function = {
     "name": "send_notification",
@@ -161,7 +165,7 @@ send_notification_function = {
     }
 }
 
-tools.append = ({"type":"function", "function":send_notification_function})
+tools.append ({"type":"function", "function":send_notification_function})
 
 #Dice rolling functionality
 def dice_roll():
