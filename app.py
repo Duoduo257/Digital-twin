@@ -108,7 +108,7 @@ def respond_ai(message,history): #the function that Gradio calls everytime user 
     system_message_enhanced = system_message + "\n\nContext:\n" + document_overview
 
     print("\n==========================\n")
-    print("User message:\n", message")
+    print("User message:\n", message)
     print("\n***Context this turn:\n", system_message_enhanced)
 
     #build messages for this turn
