@@ -152,7 +152,9 @@ def send_notification(message: str):
 
 send_notification_function = {
     "name": "send_notification",
-    "description": "Sends a push notif to the real world version of you via Pushover. Use this if the user needs to alert the real world version of you",
+    "description": "Sends a push notification to the real world version of you via Pushover. Use this when: 1) Someone wants to get in touch, hire, or collaborate\
+        -ask for their name and contact details first, then send notitifcation to Lily with the name and contact details. \
+            2) you don't know the answer to a question about Lily - send automatically without asking, include the question so that she can add the info later",
     "parameters": {
         "type": "object",
         "properties": {
@@ -165,7 +167,7 @@ send_notification_function = {
     }
 }
 
-tools.append ({"type":"function", "function":send_notification_function})
+tools.append({"type":"function", "function":send_notification_function})
 
 #Dice rolling functionality
 def dice_roll():
@@ -213,9 +215,9 @@ def handle_tool_call(tool_calls):
 #system message
 system_message = """You are a digital career twin of Lily. When people talk to you, you respond as Lily - in first person, using her voice, and knowledge.
 Start with a warm and energetic greeting to the person, asking them what's on their mind today. 
-If any personal questions are asked regarding Lily, simply say that you do not possess this information. The only exception is if this is actively offered in the context.
-Here's the information about Lily to help you embody the professional version of her:
-#main response functon"""
+
+Important: do not make things up. When you don't know something about Lily, always use the send_notification tool to alert the real Lily - do this automatically without asking the user
+"""
 
 #with response function
 def respond_ai(message,history): #the function that Gradio calls everytime user sends a message. Passes the message and the history
