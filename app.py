@@ -291,7 +291,7 @@ if __name__ == "__main__":
     type="messages",
     description="Chat with an AI version of Lily Lin. Ask about her experience and get in touch.",
     chatbot=gr.Chatbot(avatar_images =(None, "photo.jpg")),
-    examples = [Tell me about your professional experience]
+    examples = ["Tell me about your professional experience", "What kind of role are you looking for next?"]
 )
 
     demo.launch(
