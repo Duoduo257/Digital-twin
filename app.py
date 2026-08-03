@@ -3,12 +3,10 @@ from openai import OpenAI
 from dotenv import load_dotenv 
 
 import gradio as gr
-import json
 import uuid
 import chromadb
 from pprint import pprint
-import requests
-import random
+
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if OPENAI_API_KEY is None:
@@ -20,84 +18,119 @@ client = OpenAI()
 
 #Document
 document_overview = """
-Lily Lin is a New York–based Senior Program Manager and Vice President specializing in enterprise transformation, technical program management, and product delivery within fintech and hedge-fund environments. She has more than eight years of experience leading complex initiatives from strategy and prioritization through design, implementation, launch, and post-release support. Her work frequently connects engineering, finance, product, operations, executive leadership, vendors, and end users.
+Lily Lin is a New York–based Senior Project Manager and Vice President specializing in enterprise transformation, technical program management, and product delivery within fintech and hedge-fund environments. She has more than eight years of experience leading complex initiatives from strategy and prioritization through design, implementation, launch, and post-release support. Her work frequently connects engineering, finance, product, operations, executive leadership, vendors, and end users.
 
 She is particularly effective at bringing structure to ambiguous problems, coordinating multiple concurrent workstreams, establishing scalable operating processes, improving visibility through governance and reporting, and keeping technical and business stakeholders aligned. Her core areas of expertise include enterprise transformation, platform modernization, trading technology, operating-model design, process optimization, product requirements, release management, stakeholder communication, workflow automation, data analysis, and AI-enabled project operations.
-
-Professional Experience
-
-Tradeweb — Senior Program Manager/Vice President, Transformation
-October 2023–Present
-
-Lily manages program delivery for Tradeweb’s largest finance-transformation initiative, coordinating more than 100 internal stakeholders and external partners across discovery, design, and execution. She establishes governance structures using Jira tracking, executive reporting, and delivery dashboards to strengthen accountability, visibility, and coordination across workstreams.
-
-She has also operationalized ChatGPT to automate documentation and generate thousands of project artifacts daily, improving the speed and scalability of project operations. In addition, she led a department-wide SharePoint migration under aggressive timelines, developing the migration strategy and training programs to improve knowledge accessibility and enable AI-supported workflows.
-
-Beyond individual initiatives, Lily serves as a trusted resource across the Finance organization. She supports employee onboarding, adoption of tools such as Jira, Monday.com, and SharePoint, and broader project-management best practices. Her role requires building strong working relationships across Finance, Engineering, external partners, and leadership so teams can make decisions quickly and deliver consistently in a high-pressure environment.
-
-Citadel — Senior Technical Project/Product Manager
-March 2022–September 2023
-
-At Citadel, Lily led the end-to-end delivery of initiatives for a proprietary trading platform. She managed the complete project lifecycle, including prioritization, roadmap planning, execution, risk management, coordination, and launch across engineering and business teams.
-
-She partnered with senior technical and business leaders to evaluate tradeoffs, manage dependencies, and define priorities across several concurrent workstreams. She also created monthly management updates summarizing accomplishments, detailed progress, risks, and areas requiring alignment.
-
-Among her major accomplishments, Lily coordinated development changes, quality-assurance testing, configuration updates, and deployment activities to change a trading system’s restart time. This eliminated 40 minutes of daily downtime during a period of high trading activity. She also directed a vendor integration across engineering, QA, and user testing that reduced trader workflow time by 50%.
-
-Throughout the role, she facilitated technical decision-making, resolved cross-team dependencies, and aligned stakeholders to remove delivery obstacles and maintain momentum.
-
-Millennium — Product Owner
-August 2019–March 2022
-
-As a Product Owner at Millennium, Lily delivered desktop and mobile trading products for equities users. She shipped a new desktop trading application that consolidated multiple instances into a single global blotter. According to the profile, this improved order-entry time by 200% and cut the onboarding time for new traders in half.
-
-She managed day-to-day operations for the firm’s iOS equities trading application team, helping the team triple its output per release cycle. She designed and implemented a standardized release playbook that reduced deployment failures and enabled the team to double its release frequency.
-
-Lily worked directly with portfolio managers to convert business needs into actionable product requirements. Enhancements developed through this process increased mobile-application usage by 75%. She managed the full mobile-product lifecycle, including writing requirements, designing feature wireframes, collaborating with development, QA, and support teams, training users, gathering stakeholder feedback, and providing production support after release.
-
-She also maintained transparency through weekly reports to technology teams, support personnel, and senior leadership, covering feature scope, timelines, progress, and delivery status.
-
-MarketAxess — Product Owner
-August 2017–August 2019
-
-At MarketAxess, Lily managed the implementation of portfolio-trading functionality from initial concept through launch. The resulting functionality reduced order-entry time for large baskets by 75% and increased the maximum trade size by 500%.
-
-She introduced a development process that allowed high-priority enhancements to be delivered within two weeks rather than the standard three-month release schedule. The process exceeded client expectations and was later adopted by other teams.
-
-Her responsibilities included creating functional-requirement documents that defined project scope, goals, and deliverables; using SQL to investigate production issues, market gaps, and trading behavior; demonstrating new functionality to teams across the company; and resolving post-release production problems. Her product demonstrations reduced production-related questions by more than 50%.
-
-JUST Capital — Data Analytics Intern
-October 2016–May 2017
-
-At JUST Capital, Lily helped create business-intelligence tools and platforms, including webpages and dashboards, to provide greater visibility into strategic initiatives. She worked with the research team to analyze raw data from thousands of surveys and convert the findings into actionable insights.
-
-She also created extract-transform-load processes in GoodData CloudConnect to relate, model, visualize, analyze, and report datasets.
-
-Yext — Operations Intern
-June 2016–August 2016
-
-At Yext, Lily used Python and SQL to automate operational processes. She developed an automated daily-task notification system that improved accuracy and reduced manual review by 60%.
-
-She also wrote SQL scripts that analyzed open support tickets and generated alerts for time-sensitive bugs affecting VIP clients. This improved response times by more than 90%.
-
-Air Force Institute of Technology — Electrical Engineering Intern
-June 2015–August 2015
-
-Lily contributed to thesis research involving microelectronic verification. She added gate-identification algorithms in Python to improve the success rate of an existing program and overcome limitations in the available software.
-
-She performed simulations using Cadence Virtuoso, generated netlists in Spectre, and evaluated the recognition accuracy and comprehensiveness of the algorithms to verify the program’s rigor.
-
-The Cooper Union — Massive Open Online Course Developer
-May 2015–August 2015
-
-At Cooper Union, Lily developed and maintained course materials for an AP Chemistry course delivered through edX. The course had more than 5,000 enrolled students as of April 2015.
-
-She organized the course structure, uploaded educational content, maintained the course website, and ensured that materials were delivered consistently and on schedule.
 
 
 Communication style: Direct, friendly, warm, supportive.
 Make sure to only use factual information about Lily presented above. If you don't know something, just say so.
+
+Additional info: 
 """
+
+document_education = """
+I earned a Bachelor of Engineering from The Cooper Union for the Advancement of Science and Art, where I studied from 2013 to 2017 on a four-year full-tuition scholarship. My engineering education gave me a rigorous foundation in analytical thinking, technical problem-solving, systems design, and quantitative reasoning, skills that continue to shape how I approach product, program, and transformation work. While at Cooper Union, I also gained experience developing and maintaining an AP Chemistry course on edX that enrolled more than 5,000 students. Before college, I attended Stuyvesant High School from 2009 to 2013. I was also an iGEM 2014 Gold Medalist and a SASEtank 2017 Finalist.
+"""
+
+document_professional_experience=""" 
+I have more than eight years of experience leading product, program, and transformation initiatives across fintech, electronic trading, hedge funds, data analytics, and enterprise operations. My career has progressed from hands-on technical roles in engineering, data, and automation to product ownership, technical project management, and large-scale transformation leadership. Throughout this progression, I have developed a strong ability to translate business needs into executable plans, align technical and nontechnical stakeholders, improve operating processes, and deliver measurable business outcomes.
+
+I currently serve as Senior Program Manager and Vice President of Transformation at Tradeweb, where I manage program delivery for the company’s largest finance transformation initiative. I coordinate more than 100 internal stakeholders and external partners across discovery, design, and execution. I have established governance frameworks using Jira, executive reporting, and delivery dashboards to improve visibility, accountability, and alignment across interconnected workstreams. I have also operationalized ChatGPT to automate documentation and support the generation of thousands of project artifacts, increasing the speed and scalability of project operations.
+
+At Tradeweb, I also led a department-wide SharePoint migration under aggressive timelines. I helped define the migration strategy, develop training programs, improve access to organizational knowledge, and enable more efficient AI-supported workflows. In addition, I serve as a trusted resource across the Finance organization, supporting onboarding, project management best practices, and the adoption of tools such as Jira, Monday.com, and SharePoint. This work has strengthened my expertise in enterprise transformation, organizational change, knowledge management, AI adoption, program governance, and cross-functional execution.
+
+Before Tradeweb, I worked at Citadel as a Senior Technical Project/Product Manager. I led the end-to-end delivery of initiatives for a proprietary trading platform, managing work from prioritization and roadmap development through engineering, testing, deployment, and launch. I partnered with senior technical and business leaders to evaluate tradeoffs, manage risks, resolve dependencies, and coordinate multiple concurrent workstreams.
+
+One of my major Citadel initiatives involved coordinating development changes, quality assurance testing, configurations, and deployment activities to change a trading system’s restart schedule. The completed initiative eliminated 40 minutes of daily system downtime during a period of high trading activity. I also directed a vendor integration across engineering, QA, and user-testing teams that reduced trader workflow time by 50 percent. These projects required careful coordination in a high-performance environment where system reliability, execution speed, and operational efficiency were critical.
+
+From 2019 to 2022, I worked at Millennium as a Product Owner for equities trading applications. I shipped a desktop trading application that consolidated multiple system instances into a single global blotter. The product significantly improved order-entry efficiency and reduced onboarding time for new traders by half. I also led day-to-day product operations for an iOS equities trading application, helping the team triple its output per release cycle.
+
+At Millennium, I created a standardized release playbook that reduced deployment failures and doubled release frequency. I partnered with portfolio managers to translate business needs into product requirements, and the resulting enhancements increased mobile application usage by 75 percent. My responsibilities covered the full product lifecycle, including requirements writing, feature wireframes, prioritization, collaboration with engineering and QA, user training, feedback collection, release coordination, and post-launch production support.
+
+Earlier, I served as a Product Owner at MarketAxess, where I managed the development of portfolio-trading functionality from concept through launch. The solution reduced order-entry time for large baskets by 75 percent and increased the maximum supported trade size by 500 percent. I also established a faster development process that allowed high-priority enhancements to be delivered in two weeks rather than waiting for the standard three-month release cycle. The process exceeded client expectations and was later adopted by other teams.
+
+My MarketAxess responsibilities also included producing functional requirements, conducting SQL-based analysis of production issues and trading behavior, presenting product demonstrations, and resolving post-release problems. My demonstrations reduced production-related questions by more than 50 percent, reinforcing the value of clear user communication, training, and release preparation.
+
+My earlier experience gave me a foundation in analytics, software automation, and engineering. At JUST Capital, I helped develop business intelligence dashboards and analyzed data from thousands of surveys to generate actionable insights. I also created ETL processes in GoodData CloudConnect to model, relate, visualize, and report data.
+At Yext, I developed a Python-based daily task notifier that reduced manual review by 60 percent and wrote SQL scripts that identified time-sensitive bugs affecting VIP clients, improving response times by more than 90 percent. At the Air Force Institute of Technology, I contributed to microelectronic verification research by developing Python-based gate-identification algorithms and conducting simulations using Cadence Virtuoso and Spectre. I also worked as a MOOC developer at Cooper Union, organizing and maintaining an AP Chemistry course on edX that enrolled more than 5,000 students.
+
+Across these roles, I have developed expertise in financial technology, electronic trading, product development, enterprise transformation, technical program management, workflow automation, process optimization, AI-enabled operations, and stakeholder leadership. My strongest contribution is often connecting strategy with execution: defining what needs to happen, creating structure around complex work, aligning the people responsible for delivery, and ensuring that the final outcome produces measurable value."""
+
+#chunking function
+def split_text_into_chunks(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
+    BOUNDARIES = ["\n\n", "\n", ". ", "? ", "! ", " "]
+
+    def find_natural_boundary(start: int, end: int) -> int:
+        midpoint = start + (chunk_size // 2)
+        for boundary in BOUNDARIES:
+            pos = text.rfind(boundary, midpoint, end)
+            if pos != -1:
+                return pos + len(boundary)
+        return end
+    
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = min(start + chunk_size, len(text))
+        if end < len(text):
+            end = find_natural_boundary(start, end)
+        chunks.append(text[start:end])
+        if end >= len(text):
+            break
+        start = max(start + 1, end - overlap)
+    return chunks
+
+documents = [
+    {"text":document_overview, "source": "Overview"},
+    {"text":document_education, "source": "Education"},
+    {"text":document_professional_experience, "source": "Professional Experience"}
+]
+
+chunks = []
+ids = []
+metadatas = []
+
+for doc in documents:
+    chunks_ = split_text_into_chunks(doc["text"], chunk_size=150, overlap=50)
+    ids_ = [str(uuid.uuid4()) for _ in range(len(chunks_))]
+    metadatas_= [{"source":doc["source"], "chunk_index": i} for i in range(len(chunks_))]
+
+    chunks.extend(chunks_)
+    ids.extend(ids_)
+    metadatas.extend(metadatas_)
+
+#print for logs
+print(f"Created {len(chunks)} chunks:\n")
+
+for i, chunk in enumerate(chunks):
+    print(f"Chunk {i+1} (ID: {ids[i]}, Source: {metadatas[i]['source']}, Index: {metadatas[i]['chunk_index']}, Length: {len(chunk)}):")
+    print(chunk)
+    print()
+
+#generate embeddings
+response = client.embeddings.create(
+    model = "text-embedding-3-small",
+    input = chunks
+)
+
+embeddings = [item.embedding for item in response.data]
+
+#initialize chromaDB client for persistent storage
+chroma_client = chromadb.PersistentClient(path="./chroma_db")
+collection = chroma_client.get_or_create_collection(name="digital_twin")
+if collection.get()["ids"]:
+    collection.delete(collection.get()["ids"])
+
+collection.add( #parameters for the collection
+    ids=ids,
+    embeddings=embeddings,
+    documents=chunks,
+    metadatas=metadatas
+)
+
+pprint(collection.get())
+
 #system message
 system_message = """You are a digital career twin of Lily. When people talk to you, you respond as Lily - in first person, using her voice, and knowledge.
 Start with a warm and energetic greeting to the person, asking them what's on their mind today. 
@@ -107,11 +140,30 @@ Here's the information about Lily to help you embody the professional version of
 
 #with response function
 def respond_ai(message,history): #the function that Gradio calls everytime user sends a message. Passes the message and the history
-    system_message_enhanced = system_message + "\n\nContext:\n" + document_overview
+    #RAG: Embed query using same model for chunks
+    response = client.embeddings.create(
+        model = "text-embedding-3-small",
+        input = [message] #input is always a list
+    )
 
+    query_embedding = response.data[0].embedding
+
+    #RAG: search chromadb
+    results = collection.query( #queries for the 3 closest matches, applies fuzzy matching is not exact match
+        query_embeddings=[query_embedding],
+        n_results=3
+    )
+
+    #RAG: stitch retrieved chunks together to create the context for the response
+    context = "\n---\n".join(results["documents"][0])
+
+    #print logs for debugging
     print("\n==========================\n")
-    print("User message:\n", message)
-    print("\n***Context this turn:\n", system_message_enhanced)
+    print(f"User message:\n{message}\n")
+    print("***Retrieved Chunks:")
+    for a, b in zip(results["documents"][0], results["metadatas"][0]):
+        print(f"<<Document: {b['source']} --Chunk {b['chunk_index']}>>\n{a}\n")
+    system_message_enhanced = system_message + "\n\nContext:\n" + context    
 
     #build messages for this turn
     messages = [{"role":"system", "content":system_message_enhanced}] + history + [{"role":"user", "content":message}]
