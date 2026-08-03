@@ -14,6 +14,8 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if OPENAI_API_KEY is None:
     raise Exception("API key is missing.")
 else:
+    print(OPENAI_API_KEY[:8])
+        
 client = OpenAI()
 
 #Document
