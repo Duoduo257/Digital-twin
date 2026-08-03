@@ -1,11 +1,13 @@
 import os #access to Python's built in os module, allows interaction with os, reading env vars, working with file paths, etc.
 from openai import OpenAI
 from dotenv import load_dotenv 
-
+import uuid
 import gradio as gr
 import uuid
 import chromadb
 from pprint import pprint
+import json
+import random
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -131,6 +133,79 @@ collection.add( #parameters for the collection
 
 pprint(collection.get())
 
+#-----------------
+# Tools
+#-----------------
+tools = []
+#All Pushover notif code
+pushover_user = os.getenv("PUSHOVER_USER")
+pushover_token = os.getenv("PUSHOVER_TOKEN")
+pushover_url = "https://api.pushover.net/1/messages.json"
+
+def send_notification(message: str):
+    payload = {"user":pushover_user, "token":pushover_token, "message": message}
+    requests.post(pushover_url, data=payload)
+
+send_notification_function = {
+    "name": "send_notification",
+    "description": "Sends a push notif to the real world version of you via Pushover. Use this if the user needs to alert the real world version of you",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "message": {
+                "type": "string",
+                "description": "The notification message to send to the user's device"
+            }
+        },
+        "required": ["message"]
+    }
+}
+
+tools.append = ({"type":"function", "function":send_notification_function})
+
+#Dice rolling functionality
+def dice_roll():
+    result = random.randint(1,6)
+    return result
+
+roll_dice_function = {
+    "name": "dice_roll",
+    "description": "Simulates rolling a single six sided die and returns the result. Use this when the user wants to roll a die for games, deisions, or random number generator",
+    "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+        },
+    }
+
+tools.append({"type":"function", "function":roll_dice_function})
+
+#Function to handle LLM tool calling
+def handle_tool_call(tool_calls):
+    tool_results =[]
+    for tool_call in tool_calls:
+        function_name = tool_call.function.name
+        args = json.loads(tool_call.function.arguments)
+
+        if function_name == "send_notification":
+            send_notification(args["message"])
+            content = f"Notification sent: {args['message']}"
+        elif function_name == "dice_roll":
+            content = f"Rolled: {dice_roll()}"
+            #send_notification(args["message"])
+        else:
+            content = f"Unknown function:{function_name}"
+
+        tool_call_result = {
+            "role": "tool",
+            "content": content,
+            "tool_call_id": tool_call.id
+    }
+
+        tool_results.append(tool_call_result)
+        
+    return tool_results
+
 #system message
 system_message = """You are a digital career twin of Lily. When people talk to you, you respond as Lily - in first person, using her voice, and knowledge.
 Start with a warm and energetic greeting to the person, asking them what's on their mind today. 
@@ -171,10 +246,32 @@ def respond_ai(message,history): #the function that Gradio calls everytime user 
     #call LLM
     response = client.chat.completions.create(
         model="gpt-4.1-mini",
-        messages = messages
+        messages = messages,
+        tools=tools
     )
     
     message=response.choices[0].message
+
+    #check if model wants to call a tool
+    while message.tool_calls:
+        from pprint import pprint
+        pprint (message.tool_calls)
+        #handle tool call, add info about tool call response to 'context', invoke LLM one more time to get its new updated response
+        tool_result = handle_tool_call(message.tool_calls)
+        messages.append(message)
+        messages.extend(tool_result)
+        #args = json.loads(tool_call.function.arguments)
+        #send_notification(args["message"])
+        #print(f"Sent notification:{args['message']}")
+        
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=messages,
+            tools=tools
+        )
+        message=response.choices[0].message
+
+
     return(message.content)
 
 #launch gradio

@@ -6,3 +6,4 @@ chromadb
 requests
 fastapi==0.112.4
 starlette==0.38.6
+requests
