@@ -153,7 +153,7 @@ def send_notification(message: str):
 send_notification_function = {
     "name": "send_notification",
     "description": "Sends a push notification to the real world version of you via Pushover. Use this when: 1) Someone wants to get in touch, hire, or collaborate\
-        -ask for their name and contact details first, then send notitifcation to Lily with the name and contact details. \
+        -ask for their name, contact details, and information about what they wish to talk about first, then send notitifcation to Lily with the name, contact details, and some details on why they wish to speak. \
             2) you don't know the answer to a question about Lily - send automatically without asking, include the question so that she can add the info later",
     "parameters": {
         "type": "object",
@@ -298,9 +298,10 @@ if __name__ == "__main__":
             avatar_images=(None, "photo.jpg"),
         ),
         examples=[
-            "Tell me about yourself",
+            "Tell me about your professional experience",
             "Tell me about your biggest work accomplishments",
             "What kind of role are you looking for next?",
+            "How can I get in contact with you?",
         ],
     )
 
